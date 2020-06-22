@@ -1,3 +1,4 @@
+![Screenshot of the game.](preview.png)
 # Teleport Maze
 A game I made for the Mid-Jam 2020 together with [Dr. Wuro](https://drwuro.itch.io/) in less than a day.
 
