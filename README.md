@@ -15,6 +15,9 @@ Left/Right/Up/Down - Movement
 
 [Dr. Wuro](https://drwuro.itch.io/) [Idea, Level Design, Music]
 
+## License
+CC BY-NC-SA 4.0 (Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License)
+
 ## Links
 * [itch.io](https://ev3r4.itch.io/telmaze-mj-2020-fixed)
 * [itch.io (jam version)](https://ev3r4.itch.io/telmaze-mj-2020)
