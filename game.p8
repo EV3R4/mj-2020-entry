@@ -1,12 +1,16 @@
 pico-8 cartridge // http://www.pico-8.com
 version 27
 __lua__
+-- teleport maze [mid-jam 2020, post jam]
+-- by ev3r4 and zeha
+
 timer = 0
 px = 2
 py = 2
 pa = 0
 pspeed = 4
 won = false
+highscr = false
 steps = 0
 keys = 0
 tels = {}
@@ -15,6 +19,8 @@ teleported = false
 -- tel        part     a
 telparta = 0 -- unused
 telpow = {}
+
+datsteps = 0
 
 sprdoor = 2
 sprkey = 3
@@ -33,6 +39,12 @@ function cprint(t,y)
 end
 
 function _init()
+	cartdata("ev3r4_mj_2020")
+	
+	menuitem(1,"reset highscore",function()
+		dset(0,0)
+	end)
+	
 	for i=0,7 do
 		tels[i] = {}
 		telpow[i] = true
@@ -47,7 +59,7 @@ function _init()
 				obj.y = y
 				add(tels[t-sprtel], obj)
 			elseif t >= sprlevoff and
-			    t <= sprlevoffend then
+			   t <= sprlevoffend then
 				telpow[t-sprlevoff] = false
 			end
 		end
@@ -104,6 +116,12 @@ function _update()
 		mset(nx,ny,0)
 		ok = true
 		won = true
+		ststeps = dget(datsteps)
+		if steps+1 < ststeps or
+		   ststeps == 0 then
+			dset(datsteps,steps+1)
+			highscr = true
+		end
 	elseif t >= sprtel and t <= sprtelend then
 		local tel,tar
 		local g = t-sprtel
@@ -125,8 +143,8 @@ function _update()
 		end
 	end
 	if ok and
-				(px != nx or
-				py != ny) then
+	   (px != nx or
+	    py != ny) then
 		px = nx
 		py = ny
 		if pa == 0 then
@@ -166,6 +184,11 @@ function _draw()
 		cprint("you win!",48)
 		cprint("you made " .. steps .. " steps",56)
 		cprint("thanks for playing!",64)
+		if highscr then
+			rectfill(20,70,108,78,11)
+			color(7)
+			cprint("new highscore!",72)
+		end
 	end
 end
 __gfx__
