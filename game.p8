@@ -4,10 +4,13 @@ __lua__
 -- teleport maze [mid-jam 2020, post jam]
 -- by ev3r4 and zeha
 
+dbg = false
+
 ts = true
 
 psx = 2
 psy = 2
+pspeed = 4
 
 dathighscr = 0
 
@@ -45,6 +48,7 @@ txtwon2_1      = "you made "
 txtwon2_2      = " steps"
 txtwon3        = "press 🅾️ to restart "
 txtnewhighscr  = "new highscore!"
+txtdbg         = "[debug mode]"
 
 sprlevoff      = 4
 sprlevoffend   = sprlevoff+7
@@ -74,6 +78,11 @@ function cprinttv(tt)
 	end
 end
 
+-- right print
+function rprint(t,y)
+	print(t,128-#t*4,y)
+end
+
 function init_vars()
 	timer = 0
 	px = psx
@@ -82,17 +91,36 @@ function init_vars()
 	oldpd = pd
 	pdcnt = 0
 	pa = 0
-	pspeed = 4
 	won = false
 	highscr = false
 	steps = 0
 	keys = 0
-	tels = {}
 	lastteltype = -1
+	tels = {}
 	-- teleporter particle animation
 	-- tel        part     a
 	telparta = 0 -- unused
 	telpow = {}
+	
+	for i=0,7 do
+		tels[i] = {}
+		telpow[i] = true
+	end
+	for y=0,46 do
+		for x=0,62 do
+			local t = mget(x,y)
+			if t >= sprtel and
+			   t <= sprtelend then
+				local obj = {}
+				obj.x = x
+				obj.y = y
+				add(tels[t-sprtel], obj)
+			elseif t >= sprlevoff and
+			   t <= sprlevoffend then
+				telpow[t-sprlevoff] = false
+			end
+		end
+	end
 end
 
 function reset()
@@ -116,26 +144,6 @@ function _init()
 	end)
 	
 	if ts_init[ts_state] then ts_init[ts_state]() end
-	
-	for i=0,7 do
-		tels[i] = {}
-		telpow[i] = true
-	end
-	for y=0,46 do
-		for x=0,62 do
-			local t = mget(x,y)
-			if t >= sprtel and
-			   t <= sprtelend then
-				local obj = {}
-				obj.x = x
-				obj.y = y
-				add(tels[t-sprtel], obj)
-			elseif t >= sprlevoff and
-			   t <= sprlevoffend then
-				telpow[t-sprlevoff] = false
-			end
-		end
-	end
 end
 
 function _update()
@@ -208,17 +216,9 @@ function _update()
 	 
 	 telpow[nt%16-4] = on
 	elseif t == sprexitdoor then
-		mset(nx,ny,0)
-		ok = true
-		won = true
-		if steps+1 < cahhighscr or
-		   cahhighscr == 0 then
-		 local stepsp1 = steps+1
-			dset(datsteps,stepsp1)
-			cahhighscr = stepsp1
-			highscr = true
-		end
-	elseif t >= sprtel and t <= sprtelend then
+		ok = texit(nx,ny)
+	elseif t >= sprtel and
+	    t <= sprtelend then
 		local tel,tar
 		local g = t-sprtel
 		local t0 = tels[g][1]
@@ -231,7 +231,10 @@ function _update()
 			tel = t1
 			tar = t0
 		end
-		if lastteltype != g and telpow[g] then
+		if lastteltype != g and
+		   (telpow[g] or
+		    dbg and
+		    btn(5)) then
 			nx = tar.x
 			ny = tar.y
 			ok = true
@@ -240,7 +243,9 @@ function _update()
 	end
 	if ok and
 	   (px != nx or
-	    py != ny) then
+	    py != ny) or
+	   (dbg and
+	    btn(5)) then
 		px = nx
 		py = ny
 		if pa == 0 then
@@ -250,6 +255,10 @@ function _update()
 		end
 		
 		steps += 1
+	end
+	
+	if dbg then
+		if btnp(4) then texit(0,0) end
 	end
 end
 
@@ -298,6 +307,11 @@ function _draw()
 			color(clr)
 			cprint(txtnewhighscr,75)
 		end
+	end
+	
+	if dbg then
+		color(6+timer/8%2)
+		rprint(txtdbg,1)
 	end
 end
 -->8
@@ -367,6 +381,22 @@ ts_draw[2] = function()
 	spr(sprtel+telc,9,80)
 	drawschwurbel(9,80,ts_timer)
 	spr(sprlevoff+telc,107,82)
+end
+-->8
+-- tiles
+
+function texit(x,y)
+	mset(x,y,0)
+	won = true
+	if (steps+1 < cahhighscr or
+		   cahhighscr == 0) and
+		  not dbg then
+	 local stepsp1 = steps+1
+		dset(datsteps,stepsp1)
+		cahhighscr = stepsp1
+		highscr = true
+	end
+	return true
 end
 __gfx__
 0000000044444404004444000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b000
