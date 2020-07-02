@@ -18,7 +18,7 @@ txtname        = "teleport maze"
 txtath         = "by ev3r4 and zeha"
 txthighscrdpl1 = "best: "
 txthighscrdpl2 = " steps"
-txtver         = "v0.1.0 [post-jam]"
+txtver         = "v0.1.1 [post-jam]"
 txtscr = 
   "teleport maze, a game i made"
 .." for mid-jam 2020 together"
